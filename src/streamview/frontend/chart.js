@@ -1,4 +1,6 @@
-class ChartManager {
+import * as vegaEmbed from 'vega-embed';
+
+export class ChartManager {
   // Class to manage a Vega-Lite chart
   constructor(containerId) {
     // containerId: ID of HTML element to put chart in
