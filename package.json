@@ -1,0 +1,20 @@
+{
+  "name": "streamview-tutorial",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "vega": "^6.1.2",
+    "vega-embed": "^7.0.2",
+    "vega-lite": "^6.1.0"
+  }
+}
