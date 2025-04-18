@@ -12,11 +12,12 @@ app = FastAPI()
 # First arg "/static" - URL path where files will be served
 # StaticFiles(directory="static") - points to the actual 'static' folder in your project
 # name="static" - name used for URL generation
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/dist", StaticFiles(directory="frontend/dist"), name="dist")
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
 # Create a templates object pointing to your templates directory
 # This will be used to render HTML templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="frontend")
 
 # Define a route for the main page
 @app.get("/")  # Handle HTTP GET requests to the root URL "/"

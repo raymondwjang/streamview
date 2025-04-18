@@ -1,9 +1,9 @@
-import { ChartManager } from "./chart.js";
-import { DataStream } from "./stream.js";
+import { ChartManager } from "./src/chart.js";
+import { DataStream } from "./src/stream.js";
 
 // When DOM is ready...
 document.addEventListener("DOMContentLoaded", async () => {
-  // 1. Create chart manager for 'vis' element
+  // 1. Create a chart manager for the 'vis' element
   const chart = new ChartManager("vis");
   // 2. Initialize the chart
   await chart.initialize();

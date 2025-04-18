@@ -1,4 +1,4 @@
-import * as vegaEmbed from 'vega-embed';
+import embed from 'vega-embed';
 
 export class ChartManager {
   // Class to manage a Vega-Lite chart
@@ -9,7 +9,7 @@ export class ChartManager {
     // Vega-Lite specification for the chart
     this.spec = {
       // Define we're using Vega-Lite schema
-      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      $schema: "https://vega.github.io/schema/vega-lite/v6.json",
       // Define a named data source 'values'
       data: { name: "values" },
       // Create a line chart
@@ -26,7 +26,7 @@ export class ChartManager {
 
   async initialize() {
     // Create the chart using Vega-Embed
-    const result = await vegaEmbed(`#${this.containerId}`, this.spec);
+    const result = await embed(`#${this.containerId}`, this.spec);
     // Store reference to the view for updates
     this.view = result.view;
   }
