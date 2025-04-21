@@ -20,6 +20,7 @@
     "vega-lite": "^6.1.0"
   },
   "devDependencies": {
+    "source-map-loader": "^5.0.0",
     "webpack": "^5.99.5",
     "webpack-cli": "^6.0.1"
   }
