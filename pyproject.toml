@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "Raymond W. Chang", email = "raymond.w.jang@gmail.com"},
 ]
-dependencies = ["fastapi[standard]>=0.115.12", "xarray>=2025.3.1"]
+dependencies = ["fastapi[standard]>=0.115.12", "xarray>=2025.3.1", "flask>=3.1.0", "av>=14.3.0"]
 requires-python = ">=3.13"
 readme = "README.md"
 license = {text = "MIT"}
