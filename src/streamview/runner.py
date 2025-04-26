@@ -1,0 +1,96 @@
+import asyncio
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from tempfile import mkdtemp
+from fastapi import FastAPI, WebSocket
+from fastapi.responses import FileResponse
+import numpy as np
+
+from streamview.nodes import FrameStreamer, MetricStreamer
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
+
+app = FastAPI()
+
+@dataclass
+class Runner:
+    width: int = 480
+    height: int = 320
+    frame_rate: int = 30
+    templates: Jinja2Templates | None = None
+
+    def setup(self):
+        """Initialize static files and templates"""
+        frontend_dir = Path(__file__).parent / "frontend"
+        # app.mount("/static", StaticFiles(directory="static"), name="static")
+        self.templates = Jinja2Templates(directory=frontend_dir)
+
+        # Create temp directory at startup
+        self.temp_dir = Path(mkdtemp())
+        self.temp_dir.mkdir(exist_ok=True, parents=True)
+
+    def frame(self) -> np.ndarray:
+        """Generate a single frame"""
+        t = time.time()
+        frame = np.ones((self.width, self.height), dtype=np.uint8) * int(
+            255 * (np.sin(t) + 1) / 2
+        )
+        return frame
+
+    async def run_streamers(self, websocket: WebSocket):
+        """Run both frame and metric streamers"""
+        # Initialize streamers (nodes)
+        frame_streamer = FrameStreamer(
+            temp_dir=self.temp_dir,
+            width=self.width,
+            height=self.height,
+            frame_rate=self.frame_rate,
+        )
+        metric_streamer = MetricStreamer(websocket)
+
+        try:
+            while True:
+                # Generate and stream frame
+                frame = self.frame()
+                frame_streamer.process(frame)
+                
+                # Stream metric
+                await metric_streamer.process()
+                
+                # Control frame rate
+                await asyncio.sleep(1 / self.frame_rate)
+        except Exception as e:
+            print(f"Streaming error: {e}")
+        finally:
+            frame_streamer.close()
+
+# Create runner instance
+runner = Runner()
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize the runner on startup"""
+    runner.setup()
+
+@app.get("/")
+async def get(request: Request):
+    """Serve the dashboard page"""
+    if runner.templates is None:
+        raise RuntimeError("Templates not set up")
+    return runner.templates.TemplateResponse("index.html", {"request": request})
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """Handle WebSocket connection and run streamers"""
+    await websocket.accept()
+    await runner.run_streamers(websocket)
+
+@app.get("/stream/{filename}")
+async def stream(filename: str):
+    """Serve HLS stream files"""
+    stream_path = runner.temp_dir / filename
+    if stream_path.exists():
+        return FileResponse(str(stream_path))
+    return {"error": "Stream not found"}
