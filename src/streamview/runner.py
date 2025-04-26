@@ -8,11 +8,19 @@ from fastapi.responses import FileResponse
 import numpy as np
 
 from streamview.nodes import FrameStreamer, MetricStreamer
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    runner.setup()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 @dataclass
 class Runner:
@@ -24,7 +32,6 @@ class Runner:
     def setup(self):
         """Initialize static files and templates"""
         frontend_dir = Path(__file__).parent / "frontend"
-        # app.mount("/static", StaticFiles(directory="static"), name="static")
         self.templates = Jinja2Templates(directory=frontend_dir)
 
         # Create temp directory at startup
@@ -55,10 +62,10 @@ class Runner:
                 # Generate and stream frame
                 frame = self.frame()
                 frame_streamer.process(frame)
-                
+
                 # Stream metric
                 await metric_streamer.process()
-                
+
                 # Control frame rate
                 await asyncio.sleep(1 / self.frame_rate)
         except Exception as e:
@@ -66,13 +73,10 @@ class Runner:
         finally:
             frame_streamer.close()
 
-# Create runner instance
+
+# Create a runner instance
 runner = Runner()
 
-@app.on_event("startup")
-async def startup_event():
-    """Initialize the runner on startup"""
-    runner.setup()
 
 @app.get("/")
 async def get(request: Request):
@@ -81,11 +85,13 @@ async def get(request: Request):
         raise RuntimeError("Templates not set up")
     return runner.templates.TemplateResponse("index.html", {"request": request})
 
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """Handle WebSocket connection and run streamers"""
     await websocket.accept()
     await runner.run_streamers(websocket)
+
 
 @app.get("/stream/{filename}")
 async def stream(filename: str):
