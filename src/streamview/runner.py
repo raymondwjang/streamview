@@ -1,16 +1,17 @@
 import asyncio
 import time
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import mkdtemp
-from fastapi import FastAPI, WebSocket
-from fastapi.responses import FileResponse
+
 import numpy as np
+from fastapi import FastAPI, WebSocket
+from fastapi.requests import Request
+from fastapi.responses import FileResponse
+from fastapi.templating import Jinja2Templates
 
 from streamview.nodes import FrameStreamer, MetricStreamer
-from fastapi.templating import Jinja2Templates
-from fastapi.requests import Request
-from contextlib import asynccontextmanager
 
 
 @dataclass
@@ -18,6 +19,7 @@ class Runner:
     width: int = 480
     height: int = 320
     frame_rate: int = 30
+    temp_dir: Path | None = None
     templates: Jinja2Templates | None = None
 
     def setup(self):
@@ -25,7 +27,6 @@ class Runner:
         frontend_dir = Path(__file__).parent / "frontend"
         self.templates = Jinja2Templates(directory=frontend_dir)
 
-        # Create temp directory at startup
         self.temp_dir = Path(mkdtemp())
         self.temp_dir.mkdir(exist_ok=True, parents=True)
 

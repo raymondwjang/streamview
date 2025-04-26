@@ -1,6 +1,7 @@
 import random
-from fastapi import WebSocket
 from dataclasses import dataclass
+
+from fastapi import WebSocket
 
 
 @dataclass

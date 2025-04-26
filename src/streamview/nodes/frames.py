@@ -1,9 +1,9 @@
 import os
-import numpy as np
 from dataclasses import dataclass
 from pathlib import Path
 
 import av
+import numpy as np
 
 
 @dataclass
