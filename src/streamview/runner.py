@@ -13,15 +13,6 @@ from fastapi.requests import Request
 from contextlib import asynccontextmanager
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    runner.setup()
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
-
-
 @dataclass
 class Runner:
     width: int = 480
@@ -57,25 +48,35 @@ class Runner:
         )
         metric_streamer = MetricStreamer(websocket)
 
+        idx = 0
         try:
             while True:
-                # Generate and stream frame
                 frame = self.frame()
                 frame_streamer.process(frame)
 
                 # Stream metric
-                await metric_streamer.process()
+                await metric_streamer.process(idx)
 
                 # Control frame rate
                 await asyncio.sleep(1 / self.frame_rate)
+                idx += 1
         except Exception as e:
-            print(f"Streaming error: {e}")
+            print(f"RunnerError: {e}")
         finally:
             frame_streamer.close()
 
 
 # Create a runner instance
 runner = Runner()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    runner.setup()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")

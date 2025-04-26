@@ -38,7 +38,9 @@ class FrameStreamer:
         try:
             frame = frame.astype(np.uint8)
             # Create frame
-            frame = av.VideoFrame.from_ndarray(frame, format="gray").reformat(format="yuv420p")
+            frame = av.VideoFrame.from_ndarray(frame, format="gray").reformat(
+                format="yuv420p"
+            )
 
             # Encode and write the packet
             packets = self.stream.encode(frame)
@@ -46,7 +48,7 @@ class FrameStreamer:
                 self.container.mux(packet)
 
         except Exception as e:
-            print(f"Streaming error: {e}")
+            print(f"VideoStreamError: {e}")
             self.container.close()
 
     def close(self):
@@ -54,7 +56,7 @@ class FrameStreamer:
         if self.stream:
             for packet in self.stream.encode(None):  # Flush encoder
                 self.container.mux(packet)
-        
+
         # Close the container
         if self.container:
             self.container.close()

@@ -1,4 +1,3 @@
-import time
 import random
 from fastapi import WebSocket
 from dataclasses import dataclass
@@ -8,5 +7,7 @@ from dataclasses import dataclass
 class MetricStreamer:
     websocket: WebSocket
 
-    async def process(self):
-        await self.websocket.send_json({"time": time.time(), "value": random.randint(0, 100)})
+    async def process(self, idx: int):
+        await self.websocket.send_json(
+            {"index": idx, "value": int(random.random() * 10000) / 100}
+        )
