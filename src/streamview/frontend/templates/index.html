@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>StreamView Dashboard</title>
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  </head>
+  <body>
+    <div class="dashboard">
+      <div class="video-container">
+        <video-js
+          id="stream-player"
+          class="vjs-default-skin"
+          controls
+          width="{{ config.video.width }}"
+          height="{{ config.video.height }}"
+        >
+          <source
+            src="{{ config.video.streamPath }}"
+            type="application/x-mpegURL"
+          />
+        </video-js>
+      </div>
+      <div id="plot-container"></div>
+    </div>
+
+    <script>
+      window.config = {{ config | tojson | safe }};
+    </script>
+    <script src="{{ url_for('static', path='dashboard.js') }}"></script>
+  </body>
+</html>

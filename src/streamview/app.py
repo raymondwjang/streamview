@@ -4,10 +4,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket
 from fastapi.requests import Request
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from streamview.config import CONFIG
 from streamview.runner import Runner
+
+
+frontend_dir = Path(__file__).parent / "frontend"
+templates = Jinja2Templates(directory=frontend_dir / "templates")
 
 runner = Runner()
 
@@ -20,8 +25,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-frontend_dir = Path(__file__).parent / "frontend"
-templates = Jinja2Templates(directory=frontend_dir)
+app.mount(
+    path="/static", app=StaticFiles(directory=frontend_dir / "static"), name="static"
+)
 
 
 @app.get("/")
