@@ -15,16 +15,21 @@
           id="stream-player"
           class="vjs-default-skin"
           controls
-          width="480"
-          height="320"
+          width="{{ config.video.width }}"
+          height="{{ config.video.height }}"
         >
-          <source src="/stream/stream.m3u8" type="application/x-mpegURL" />
+          <source
+            src="{{ config.video.streamPath }}"
+            type="application/x-mpegURL"
+          />
         </video-js>
       </div>
       <div id="plot-container"></div>
     </div>
 
     <script>
+      window.config = {{ config | tojson | safe }};
+
       // Initialize video player
       var player = videojs("stream-player", {
         fluid: true,
@@ -36,8 +41,8 @@
       const spec = {
         $schema: "https://vega.github.io/schema/vega-lite/v5.json",
         description: "Live data stream",
-        width: 480,
-        height: 200,
+        width: window.config.video.width,
+        height: window.config.video.height,
         data: { name: "table" },
         mark: "line",
         encoding: {

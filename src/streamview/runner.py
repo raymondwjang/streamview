@@ -12,13 +12,14 @@ from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 
 from streamview.nodes import FrameStreamer, MetricStreamer
+from streamview.config import CONFIG
 
 
 @dataclass
 class Runner:
-    width: int = 480
-    height: int = 320
-    frame_rate: int = 30
+    width: int = CONFIG["video"]["width"]
+    height: int = CONFIG["video"]["height"]
+    frame_rate: int = CONFIG["video"]["frameRate"]
     temp_dir: Path | None = None
     templates: Jinja2Templates | None = None
 
@@ -85,7 +86,9 @@ async def get(request: Request):
     """Serve the dashboard page"""
     if runner.templates is None:
         raise RuntimeError("Templates not set up")
-    return runner.templates.TemplateResponse("index.html", {"request": request})
+    return runner.templates.TemplateResponse(
+        "index.html", {"request": request, "config": CONFIG}
+    )
 
 
 @app.websocket("/ws")

@@ -1,0 +1,10 @@
+video:
+  width: 480
+  height: 320
+  frameRate: 30
+  streamPath: "/stream/stream.m3u8"
+
+plot:
+  width: 480
+  height: 200
+  maxPoints: 100
