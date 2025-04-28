@@ -1,15 +1,11 @@
 import asyncio
 import time
-from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import mkdtemp
 
 import numpy as np
-from fastapi import FastAPI, WebSocket
-from fastapi.requests import Request
-from fastapi.responses import FileResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import WebSocket
 
 from streamview.nodes import FrameStreamer, MetricStreamer
 from streamview.config import CONFIG
@@ -21,12 +17,9 @@ class Runner:
     height: int = CONFIG["video"]["height"]
     frame_rate: int = CONFIG["video"]["frameRate"]
     temp_dir: Path | None = None
-    templates: Jinja2Templates | None = None
 
     def setup(self):
         """Initialize static files and templates"""
-        frontend_dir = Path(__file__).parent / "frontend"
-        self.templates = Jinja2Templates(directory=frontend_dir)
 
         self.temp_dir = Path(mkdtemp())
         self.temp_dir.mkdir(exist_ok=True, parents=True)
@@ -66,42 +59,3 @@ class Runner:
             print(f"RunnerError: {e}")
         finally:
             frame_streamer.close()
-
-
-# Create a runner instance
-runner = Runner()
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    runner.setup()
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
-
-
-@app.get("/")
-async def get(request: Request):
-    """Serve the dashboard page"""
-    if runner.templates is None:
-        raise RuntimeError("Templates not set up")
-    return runner.templates.TemplateResponse(
-        "index.html", {"request": request, "config": CONFIG}
-    )
-
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """Handle WebSocket connection and run streamers"""
-    await websocket.accept()
-    await runner.run_streamers(websocket)
-
-
-@app.get("/stream/{filename}")
-async def stream(filename: str):
-    """Serve HLS stream files"""
-    stream_path = runner.temp_dir / filename
-    if stream_path.exists():
-        return FileResponse(str(stream_path))
-    return {"error": "Stream not found"}
