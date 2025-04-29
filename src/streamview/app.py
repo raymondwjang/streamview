@@ -11,7 +11,7 @@ from streamview.config import CONFIG
 from streamview.runner import Runner
 
 
-frontend_dir = Path(__file__).parent / "frontend"
+frontend_dir = Path(__file__).parents[2] / "frontend"
 templates = Jinja2Templates(directory=frontend_dir / "templates")
 
 runner = Runner()
