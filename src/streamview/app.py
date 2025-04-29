@@ -51,4 +51,4 @@ async def stream(filename: str):
     stream_path = runner.temp_dir / filename
     if stream_path.exists():
         return FileResponse(str(stream_path))
-    return {"error": "Stream not found"}
+    return {"AppStreamError": "Stream not found"}

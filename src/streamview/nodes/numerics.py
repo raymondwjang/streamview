@@ -17,5 +17,5 @@ class MetricStreamer:
             )
         # https://fastapi.tiangolo.com/reference/websockets/#fastapi.WebSocket.send
         except Exception as e:
-            print(e)
+            print(f"MetricError: {e}")
             pass
