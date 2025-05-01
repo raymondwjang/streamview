@@ -9,8 +9,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from streamview.config import load_config  # isort:skip
-from streamview.runner import Runner  # isort:skip
 from streamview.socket_manager import ConnectionManager  # isort:skip
+from streamview.runner import Runner  # isort:skip
 
 frontend_dir = Path(__file__).parents[2] / "frontend"
 templates = Jinja2Templates(directory=frontend_dir / "templates")
@@ -36,9 +36,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.mount(
-    path="/static", app=StaticFiles(directory=frontend_dir / "static"), name="static"
-)
+app.mount(path="/dist", app=StaticFiles(directory=frontend_dir / "dist"), name="dist")
 
 
 @app.get("/")
