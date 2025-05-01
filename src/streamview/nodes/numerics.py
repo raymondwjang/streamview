@@ -1,21 +1,26 @@
 import random
 from dataclasses import dataclass
 from logging import getLogger
-from fastapi import WebSocket, WebSocketDisconnect
+
+from fastapi import WebSocketDisconnect
+
+from streamview.app import ConnectionManager
 
 logger = getLogger(__file__)
 
 
 @dataclass
 class MetricStreamer:
-    websocket: WebSocket
+    manager: ConnectionManager
 
     async def process(self, idx: int):
         try:
-            await self.websocket.send_json(
-                {"index": idx, "value": int(random.random() * 10000) / 100}
-            )
+            for websocket in self.manager.active_connections:
+                await self.manager.send_json(
+                    {"index": idx, "value": int(random.random() * 10000) / 100},
+                    websocket,
+                )
         # https://fastapi.tiangolo.com/reference/websockets/#fastapi.WebSocket.send
-        except Exception as e:
-            print(f"MetricError: {e}")
+        except WebSocketDisconnect:
+            self.manager.disconnect(websocket)
             pass

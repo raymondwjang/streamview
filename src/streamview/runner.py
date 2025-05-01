@@ -5,17 +5,19 @@ from pathlib import Path
 from tempfile import mkdtemp
 
 import numpy as np
-from fastapi import WebSocket
 
+from streamview.config import load_config
 from streamview.nodes import FrameStreamer, MetricStreamer
-from streamview.config import CONFIG
+from streamview.socket_manager import ConnectionManager
+
+config = load_config()
 
 
 @dataclass
 class Runner:
-    width: int = CONFIG["video"]["width"]
-    height: int = CONFIG["video"]["height"]
-    frame_rate: int = CONFIG["video"]["frameRate"]
+    width: int = config["video"]["width"]
+    height: int = config["video"]["height"]
+    frame_rate: int = config["video"]["frameRate"]
     temp_dir: Path | None = None
 
     def setup(self):
@@ -32,7 +34,7 @@ class Runner:
         )
         return frame
 
-    async def run_streamers(self, websocket: WebSocket):
+    async def run_streamers(self, manager: ConnectionManager):
         """Run both frame and metric streamers"""
         # Initialize streamers (nodes)
         frame_streamer = FrameStreamer(
@@ -41,7 +43,7 @@ class Runner:
             height=self.height,
             frame_rate=self.frame_rate,
         )
-        metric_streamer = MetricStreamer(websocket)
+        metric_streamer = MetricStreamer(manager)
 
         idx = 0
         try:
