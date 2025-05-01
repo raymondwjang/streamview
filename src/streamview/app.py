@@ -27,8 +27,7 @@ async def lifespan(app: FastAPI):
     runner.setup()
 
     # Start the streamers in the background
-    # You'll need to modify runner.run_streamers to not block the event loop
-    # or run it in a background task
+    # modify runner.run_streamers to not block the event loop or run it in a background task
     asyncio.create_task(runner.run_streamers(manager))
 
     yield
@@ -53,14 +52,10 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     # Keep the connection alive
     try:
-        # You might need to implement some kind of waiting mechanism here
-        # to keep the connection open until the client disconnects
+        # some kind of waiting mechanism here to keep the connection open until the client disconnects
         while True:
-            # Wait for messages from the client if needed
             await websocket.receive_text()
-            # Process the received data if needed
     except WebSocketDisconnect:
-        # Handle disconnection
         manager.disconnect(websocket)
 
 

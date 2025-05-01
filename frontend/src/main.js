@@ -1,6 +1,5 @@
-import embed from 'vega-embed';
-import * as vega from 'vega';
 import VideoPlayer from "./components/videoPlayer";
+import LineChart from "./components/lineChart";
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,45 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
     videoPlayer.initialize();
     videoPlayer.play();
 
-// Initialize Vega plot
-    const spec = {
-        $schema: "https://vega.github.io/schema/vega-lite/v6.json",
-        description: "Live data stream",
-        width: window.config.video.width,
-        height: window.config.video.height,
-        data: {name: "table"},
-        mark: "line",
-        encoding: {
-            x: {
-                field: "index",
-                type: "quantitative",
-            },
-            y: {field: "value", type: "quantitative"},
-        },
-    };
+    const chart = new LineChart('#plot-container', config.plot)
 
-// Create WebSocket connection
+    // Create WebSocket connection
     const ws = new WebSocket(`ws://${window.location.host}/ws`);
-    let values = [];
 
-    embed("#plot-container", spec).then((result) => {
-        const view = result.view;
-
+    chart.initialize().then(() => {
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const currentData = view.data("table");
-            if (currentData.length >= window.config.plot.maxPoints) {
-                // Get the oldest time we want to remove
-                const oldestIdx = currentData[0].index;
-                const changeSet = vega.changeset().insert(data).remove((t) => t.index === oldestIdx); // Remove the point with oldest time
-
-
-                view.change("table", changeSet).run();
-            } else {
-                // Just insert if we're under maxPoints
-                const changeSet = vega.changeset().insert(data);
-                view.change("table", changeSet).run();
-            }
+            chart.updateData(data);
         };
     });
 });
