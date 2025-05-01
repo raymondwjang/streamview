@@ -6,9 +6,9 @@ from tempfile import mkdtemp
 
 import numpy as np
 
+from streamview.socket_manager import ConnectionManager  # isort:skip
 from streamview.config import load_config
-from streamview.nodes import FrameStreamer, MetricStreamer
-from streamview.socket_manager import ConnectionManager
+from streamview.nodes import FrameStreamer, MetricStreamer  # isort:skip
 
 config = load_config()
 

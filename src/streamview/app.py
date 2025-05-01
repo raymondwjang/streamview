@@ -1,15 +1,15 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.requests import Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from streamview.config import load_config
-from streamview.runner import Runner
-from streamview.socket_manager import ConnectionManager
+from streamview.config import load_config  # isort:skip
+from streamview.socket_manager import ConnectionManager  # isort:skip
+from streamview.runner import Runner  # isort:skip
 
 frontend_dir = Path(__file__).parents[2] / "frontend"
 templates = Jinja2Templates(directory=frontend_dir / "templates")
@@ -24,6 +24,14 @@ manager = ConnectionManager()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     runner.setup()
+
+    # Start the streamers in the background
+    # You'll need to modify runner.run_streamers to not block the event loop
+    # or run it in a background task
+    import asyncio
+
+    asyncio.create_task(runner.run_streamers(manager))
+
     yield
 
 
@@ -46,9 +54,17 @@ async def get(request: Request):
 async def websocket_endpoint(websocket: WebSocket):
     """Handle WebSocket connection and run streamers"""
     await manager.connect(websocket)
-    await runner.run_streamers(
-        manager
-    )  # --> this shouldn't be here. runner should just be running, and websocket (manager) simply connects to it.
+    # Keep the connection alive
+    try:
+        # You might need to implement some kind of waiting mechanism here
+        # to keep the connection open until the client disconnects
+        while True:
+            # Wait for messages from the client if needed
+            data = await websocket.receive_text()
+            # Process the received data if needed
+    except WebSocketDisconnect as e:
+        # Handle disconnection
+        manager.disconnect(websocket)
 
 
 @app.get("/stream/{filename}")
