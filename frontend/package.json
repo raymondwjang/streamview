@@ -1,12 +1,21 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "esbuild src/main.js --bundle --outfile=dist/main.js --watch",
+    "build": "esbuild src/main.js --bundle --minify --outfile=dist/main.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "vega": "^6.1.2",
+    "vega-embed": "^7.0.2",
+    "vega-lite": "^6.1.0",
+    "video.js": "^8.22.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.3"
+  }
 }
