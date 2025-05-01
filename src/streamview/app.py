@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -8,8 +9,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from streamview.config import load_config  # isort:skip
-from streamview.socket_manager import ConnectionManager  # isort:skip
 from streamview.runner import Runner  # isort:skip
+from streamview.socket_manager import ConnectionManager  # isort:skip
 
 frontend_dir = Path(__file__).parents[2] / "frontend"
 templates = Jinja2Templates(directory=frontend_dir / "templates")
@@ -28,8 +29,6 @@ async def lifespan(app: FastAPI):
     # Start the streamers in the background
     # You'll need to modify runner.run_streamers to not block the event loop
     # or run it in a background task
-    import asyncio
-
     asyncio.create_task(runner.run_streamers(manager))
 
     yield
