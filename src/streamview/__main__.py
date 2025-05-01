@@ -1,5 +1,4 @@
 import uvicorn
-from streamview.app import app
 
 
 def main():

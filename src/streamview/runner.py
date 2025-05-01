@@ -48,8 +48,8 @@ class Runner:
         idx = 0
         try:
             while True:
-                frame = self.frame()
-                frame_streamer.process(frame)
+                frame = await asyncio.to_thread(self.frame)
+                await asyncio.to_thread(frame_streamer.process, frame)
 
                 # Stream metric
                 await metric_streamer.process(idx)
