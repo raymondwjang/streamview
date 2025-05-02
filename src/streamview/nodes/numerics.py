@@ -22,5 +22,7 @@ class MetricStreamer:
                 )
         # https://fastapi.tiangolo.com/reference/websockets/#fastapi.WebSocket.send
         except WebSocketDisconnect:
-            self.manager.disconnect(websocket)
+            print(f"Num Connections: {len(self.manager.active_connections)}")
+            if websocket in self.manager.active_connections:
+                self.manager.disconnect(websocket)
             pass

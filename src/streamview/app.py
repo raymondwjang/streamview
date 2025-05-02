@@ -56,7 +56,9 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        print(f"Num Connections: {len(manager.active_connections)}")
+        if websocket in manager.active_connections:
+            manager.disconnect(websocket)
 
 
 @app.get("/stream/{filename}")
