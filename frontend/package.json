@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "esbuild src/main.js --bundle --outfile=dist/main.js --watch",
-    "build": "esbuild src/main.js --bundle --minify --outfile=dist/main.js"
+    "build": "esbuild src/main.js --bundle --minify --outfile=dist/main.js",
+    "start": "concurrently --names frontend,backend -c red,blue 'npm run dev' 'python -m streamview --debug'"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "video.js": "^8.22.0"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "esbuild": "^0.25.3"
   }
 }
