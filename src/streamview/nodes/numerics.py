@@ -4,7 +4,7 @@ from logging import getLogger
 
 from fastapi import WebSocketDisconnect
 
-from streamview.app import ConnectionManager
+from streamview.socket_manager import ConnectionManager
 
 logger = getLogger(__file__)
 

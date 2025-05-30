@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "esbuild src/main.js --bundle --outfile=dist/main.js --watch",
     "build": "esbuild src/main.js --bundle --minify --outfile=dist/main.js",
-    "start": "concurrently --names frontend,backend -c red,blue 'npm run dev' 'python -m streamview --debug'"
+    "start": "concurrently --names frontend,backend -c red,blue 'npm run dev' 'pdm run python -m streamview --debug'"
   },
   "keywords": [],
   "author": "",

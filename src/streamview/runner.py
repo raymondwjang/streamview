@@ -9,6 +9,9 @@ import numpy as np
 from streamview.socket_manager import ConnectionManager  # isort:skip
 from streamview.config import load_config
 from streamview.nodes import FrameStreamer, MetricStreamer  # isort:skip
+import logging
+
+logger = logging.getLogger(__file__)
 
 config = load_config()
 
@@ -25,6 +28,7 @@ class Runner:
 
         self.temp_dir = Path(mkdtemp())
         self.temp_dir.mkdir(exist_ok=True, parents=True)
+        print(f"Temp dir: {self.temp_dir}")
 
     def frame(self) -> np.ndarray:
         """Generate a single frame"""
